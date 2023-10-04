@@ -15,13 +15,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='UserProfile',
+            name='Order',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('phone_number', models.CharField(max_length=15, unique=True)),
-                ('date_of_birth', models.DateField()),
-                ('profile_picture', models.ImageField(blank=True, null=True, upload_to='media/profile_pics/')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('order_number', models.CharField(max_length=6, unique=True)),
+                ('status', models.CharField(default='pending', max_length=20)),
+                ('file', models.FileField(upload_to='media/file/')),
+                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]
