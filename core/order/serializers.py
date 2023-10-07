@@ -1,11 +1,18 @@
 from rest_framework import serializers
 from multiupload.fields import MultiFileField
-from order.models import Order
+from order.models import Order, FileImageForOrder
 
-class OrderSerializers(serializers.ModelSerializer):
-    file = MultiFileField(min_num=0, max_num=3)
+
+class FileImageForOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileImageForOrder
+        fields = ('order_file',)
+        
+        
+class OrderSerializer(serializers.ModelSerializer):
+    files = FileImageForOrderSerializer(many=True)
+
     class Meta:
         model = Order
-        fields = ['order_number', 'user', 'status', 'file']
+        fields = ('order_number', 'user', 'status', 'files')
         read_only_fields = ['order_number']
-        
