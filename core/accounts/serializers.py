@@ -1,17 +1,20 @@
 from rest_framework import serializers
-
-from accounts.models import UserProfile
 from django.contrib.auth.models import User
 from datetime import datetime
+
+from order.serializers import OrderSerializer
+from accounts.models import UserProfile
 
  
 class UserProfileSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
+
     class Meta:
         model = UserProfile
         fields = ('id', 'phone_number', 'date_of_birth', 'profile_picture', 'password', 'age')
         read_only_fields = ['age']
+        
         
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -41,7 +44,20 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return age
         else:
             return 0
+        
+        
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username',)
+        
 
-    
+class UserListWithOrders(serializers.ModelSerializer):
+    orders = OrderSerializer(many=True)
+    user = UserSerializer()
+    class Meta:
+        model = UserProfile
+        fields = ('id', 'user', 'date_of_birth', 'profile_picture', 'age', 'orders')
+        read_only_fields = ['age', 'password',]
 
     

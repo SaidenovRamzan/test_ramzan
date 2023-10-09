@@ -3,24 +3,39 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 
 from accounts.models import UserProfile
-from accounts.serializers import UserProfileSerializer
+from accounts.serializers import UserProfileSerializer, UserListWithOrders
+from order.permissions import IsOwnerOrReadOnly, AdultPermission
 
 
 class UserProfileApiView(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    permissions = {
+        'update': [IsOwnerOrReadOnly(), 
+                   AdultPermission(),
+                   ],
+        'partial_update':[IsOwnerOrReadOnly(),
+                          AdultPermission(),
+                          ],
+        'destroy':[IsOwnerOrReadOnly(), 
+                   AdultPermission(),
+                   ],
+    }
     
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        age = self.get_age(serializer.data.get('date_of_birth'))
+        serializer = UserListWithOrders(instance)
         response_data = serializer.data
-        response_data['age'] = age
         return Response(response_data)
       
     def perform_destroy(self, instance):
         user = User.objects.filter(username=instance.phone_number)
         user.delete()
-        instance.delete() 
-     
-
+        instance.delete()
+        
+    def get_permissions(self):
+        if self.action in self.permissions:
+            perm = self.permissions.get(self.action)
+            return perm
+        return super().get_permissions()
+    

@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
 import random
+from accounts.models import UserProfile
 
 
 class Order(models.Model):
@@ -11,7 +11,7 @@ class Order(models.Model):
     ]
     
     order_number = models.CharField(max_length=6, unique=True)
-    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(UserProfile, null=True, blank=True, on_delete=models.SET_NULL, related_name='orders')
     status = models.CharField(choices=Choices, max_length=20, default='В ожидании')
     descrption = models.CharField(max_length=500, null=False)
     def __str__(self):

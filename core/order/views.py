@@ -1,26 +1,47 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser
-from rest_framework.permissions import IsAuthenticated
-from order.models import Order, FileImageForOrder
 from django.contrib.auth.models import User
-
-from order.serializers import FileImageForOrderSerializer, OrderSerializer
 from rest_framework.response import Response
-from rest_framework import status
+
+from order.serializers import OrderSerializer
+from order.models import Order, FileImageForOrder
+from order.permissions import IsOwnerOrReadOnly, AdultPermission
 
 
 class OrderViewSets(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    # permission_classes = (IsAuthenticated, )
+    permissions = {
+        'create': [permissions.AllowAny(), 
+                   AdultPermission(),
+                   ],
+        'update': [IsOwnerOrReadOnly(), 
+                   AdultPermission(),
+                   ],
+        'partial_update':[IsOwnerOrReadOnly(),
+                          AdultPermission(),
+                          ],
+        'destroy':[IsOwnerOrReadOnly(), 
+                   AdultPermission(),
+                   ],
+        'list':[permissions.AllowAny(), 
+                AdultPermission(),
+                ],
+        'retrieve':[permissions.AllowAny(), 
+                    AdultPermission(),
+                    ]
+    }
+    
+    def get_permissions(self):
+        if self.action:
+            return self.permissions.get(self.action)
+        return [permissions.AllowAny()]
     
     def create(self, request, *args, **kwargs):
         try:
             user = User.objects.get(id=request.data.get('user'))
             order = Order.objects.create(user=User.objects.get(id=user.id))
         except User.DoesNotExist:
-            # return Response({"error": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND)
             ...
         
         files = request.data.pop('files')
@@ -44,18 +65,3 @@ class OrderViewSets(viewsets.ModelViewSet):
 
 class Test(APIView):
     ...
-#     def get(self, request, format=None):
-#         orders = Order.objects.all()
-#         serializer = OrderSerializer(orders, many=True)
-#         return Response(serializer.data)
-    
-#     def post(self, request, format=None):
-#             print(request.data,',===============')
-#             files = request.data.pop('files')
-#             user = User.objects.get(id=request.data.get('user'))
-#             print(files,'--------------------------')
-#             order = Order.objects.create(user=User.objects.get(id=user.id))
-#             for file in files:
-#                 print(file.get('order_file'),'999999999999999999999999999999')
-#                 FileImageForOrder.objects.create(order=order, order_file=file.get('order_file')) http://localhost:8000/api/v1/order/7/
-#             return Response(request.data)
