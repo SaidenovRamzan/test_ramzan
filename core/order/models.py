@@ -13,7 +13,7 @@ class Order(models.Model):
     order_number = models.CharField(max_length=6, unique=True)
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     status = models.CharField(choices=Choices, max_length=20, default='В ожидании')
-    
+    descrption = models.CharField(max_length=500, null=False)
     def __str__(self):
         return self.order_number
     
@@ -27,10 +27,7 @@ class Order(models.Model):
 
 
 class FileImageForOrder(models.Model):
-    order_file = models.FileField(upload_to='media/file/')
+    order_file = models.FileField(upload_to='file/')
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="files")
     
-# class OrderFileModel(models.Model):
-#     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-#     file = models.ForeignKey(FileImageForOrder, on_delete=models.CASCADE)
     

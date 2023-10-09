@@ -25,3 +25,4 @@ urlpatterns = [
     path('api/token/refresh/', views.TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
 ]
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY5Njg2ODA1OSwiaWF0IjoxNjk2NzgxNjU5LCJqdGkiOiI5NTk5YzM1NDdiMzA0NmY0ODIyMGY1NDgxNzc4YTYxNSIsInVzZXJfaWQiOjN9.PMTTx3l-udL1L189iZhNUpHi7pi2ZwiJQW3--o4Macs
